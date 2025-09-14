@@ -7,33 +7,34 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/nicograef/qugo/qugo"
+	"context"
+	"sync"
+
+	"github.com/nicograef/qugo/api"
+	"github.com/nicograef/qugo/config"
+	"github.com/nicograef/qugo/core"
 )
 
 func main() {
+	cfg := config.Load()
+
 	server := &http.Server{
-		Addr: ":3000",
+		Addr: fmt.Sprintf(":%d", cfg.Port),
 	}
 
-	// Get queue size and consumer URL from env
-	queueSize := 1000
-	if v := os.Getenv("QUEUE_SIZE"); v != "" {
-		fmt.Sscanf(v, "%d", &queueSize)
-	}
-	consumerURL := os.Getenv("CONSUMER_URL")
-	if consumerURL == "" {
-		consumerURL = "http://localhost:4000"
-	}
+	queue := make(chan core.Message, cfg.QueueSize)
 
-	appQueue := make(chan qugo.Message, queueSize)
+	http.HandleFunc("/", api.NewEnqueueHandler(queue))
 
-	http.HandleFunc("/", qugo.NewEnqueueHandler(appQueue))
+	// WaitGroup for consumer goroutine
+	var wg sync.WaitGroup
+	wg.Add(1)
 
 	// Consumer goroutine: reads from channel and calls webhook
 	go func() {
-		for msg := range appQueue {
-			// Send message to webhook
-			resp, err := qugo.SendToWebhook(consumerURL, msg)
+		defer wg.Done()
+		for msg := range queue {
+			resp, err := core.SendToWebhook(cfg.ConsumerUrl, msg)
 			if err != nil {
 				fmt.Printf("Error sending to webhook: %v\n", err)
 			} else {
@@ -47,12 +48,24 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		fmt.Printf("Signal %s received, shutting down...\n", <-sigs)
+		<-sigs
+		fmt.Println("Signal received, shutting down...")
+		// Gracefully shutdown HTTP server
+		ctx, cancel := context.WithTimeout(context.Background(), 5_000_000_000) // 5s
+		defer cancel()
+		if err := server.Shutdown(ctx); err != nil {
+			fmt.Printf("HTTP server Shutdown: %v\n", err)
+		}
+		// Close queue channel to stop consumer
+		close(queue)
+		// Wait for consumer goroutine to finish
+		wg.Wait()
+		fmt.Println("Shutdown complete.")
 		os.Exit(0)
 	}()
 
 	err := server.ListenAndServe()
-	if err != nil {
+	if err != nil && err != http.ErrServerClosed {
 		panic(err)
 	}
 }

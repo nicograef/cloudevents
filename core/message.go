@@ -1,4 +1,4 @@
-package qugo
+package core
 
 import (
 	"time"

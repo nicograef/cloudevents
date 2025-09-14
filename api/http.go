@@ -1,4 +1,4 @@
-package qugo
+package api
 
 // helper function for sending json responses
 import (
