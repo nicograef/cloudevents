@@ -21,7 +21,7 @@ func TestLoad_Defaults(t *testing.T) {
 
 func TestLoad_EnvValues(t *testing.T) {
 	os.Setenv("PORT", "8080")
-	os.Setenv("QUEUE_SIZE", "42")
+	os.Setenv("CAPACITY", "42")
 	os.Setenv("CONSUMER_URL", "http://test/webhook")
 	cfg := Load()
 	if cfg.Port != 8080 {
@@ -37,7 +37,7 @@ func TestLoad_EnvValues(t *testing.T) {
 
 func TestLoad_InvalidInt(t *testing.T) {
 	os.Setenv("PORT", "notanint")
-	os.Setenv("QUEUE_SIZE", "badint")
+	os.Setenv("CAPACITY", "badint")
 	cfg := Load()
 	if cfg.Port != 3000 {
 		t.Errorf("expected fallback port 3000, got %d", cfg.Port)
