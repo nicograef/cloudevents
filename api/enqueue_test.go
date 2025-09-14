@@ -7,14 +7,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/nicograef/qugo/core"
+	"github.com/nicograef/qugo/queue"
 )
 
 func TestNewEnqueueHandler_Success(t *testing.T) {
-	queue := make(chan core.Message, 1)
-	handler := NewEnqueueHandler(queue)
+	q := &queue.Queue{Queue: make(chan queue.QueueMessage, 1)}
+	handler := NewEnqueueHandler(*q)
 
-	msg := core.Message{Type: "test"}
+	msg := queue.Message{Type: "test"}
 	body, _ := json.Marshal(msg)
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()
@@ -35,9 +35,12 @@ func TestNewEnqueueHandler_Success(t *testing.T) {
 		t.Errorf("expected QueueSize 1, got %d", resp.QueueSize)
 	}
 	select {
-	case got := <-queue:
-		if got.Type != "test" {
-			t.Errorf("expected message type 'test', got %s", got.Type)
+	case got := <-q.Queue:
+		if got.Message.Type != "test" {
+			t.Errorf("expected message type 'test', got %s", got.Message.Type)
+		}
+		if got.Attempts != 0 {
+			t.Errorf("expected Attempts 0, got %d", got.Attempts)
 		}
 	default:
 		t.Errorf("expected message in queue")
@@ -45,8 +48,8 @@ func TestNewEnqueueHandler_Success(t *testing.T) {
 }
 
 func TestNewEnqueueHandler_MethodNotAllowed(t *testing.T) {
-	queue := make(chan core.Message, 1)
-	handler := NewEnqueueHandler(queue)
+	q := &queue.Queue{Queue: make(chan queue.QueueMessage, 1)}
+	handler := NewEnqueueHandler(*q)
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	handler(rec, req)

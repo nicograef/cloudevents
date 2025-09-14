@@ -13,34 +13,24 @@ import (
 
 	"github.com/nicograef/qugo/api"
 	"github.com/nicograef/qugo/config"
-	"github.com/nicograef/qugo/core"
+	"github.com/nicograef/qugo/queue"
 )
 
 func main() {
 	cfg := config.Load()
+	appQueue := queue.NewQueue(cfg.Capacity)
 
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%d", cfg.Port),
 	}
+	http.HandleFunc("/", api.NewEnqueueHandler(appQueue))
 
-	queue := make(chan core.Message, cfg.Capacity)
-
-	http.HandleFunc("/", api.NewEnqueueHandler(queue))
-
-	// WaitGroup for consumer goroutine
 	var wg sync.WaitGroup
 	wg.Add(1)
-
-	// Consumer goroutine: reads from channel and calls webhook
 	go func() {
 		defer wg.Done()
-		for msg := range queue {
-			resp, err := core.SendToWebhook(cfg.ConsumerURL, msg)
-			if err != nil {
-				log.Printf("Error sending to webhook: %v", err)
-			} else {
-				log.Printf("Webhook response: %s", resp)
-			}
+		for item := range appQueue.Queue {
+			appQueue.HandleQueueItem(item, cfg.ConsumerURL, queue.SendToWebhook)
 		}
 	}()
 
@@ -58,7 +48,7 @@ func main() {
 			log.Printf("HTTP server Shutdown: %v", err)
 		}
 		// Close queue channel to stop consumer
-		close(queue)
+		close(appQueue.Queue)
 		// Wait for consumer goroutine to finish
 		wg.Wait()
 		log.Println("Shutdown complete.")

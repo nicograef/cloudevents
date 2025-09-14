@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/nicograef/qugo/core"
+	"github.com/nicograef/qugo/queue"
 )
 
 // EnqueueResponse represents the response from the enqueue API endpoint.
@@ -14,22 +14,22 @@ type EnqueueResponse struct {
 
 // NewEnqueueHandler returns an HTTP handler for enqueuing messages into the queue.
 // It expects a POST request with a JSON body containing a 'message' field.
-func NewEnqueueHandler(appQueue chan core.Message) http.HandlerFunc {
+func NewEnqueueHandler(appQueue queue.Queue) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !validateMethod(w, r, http.MethodPost) {
 			return
 		}
 
-		message := core.Message{}
+		message := queue.Message{}
 		if !readJSONRequest(w, r, &message) {
 			return
 		}
 
-		appQueue <- message
+		appQueue.Queue <- queue.QueueMessage{Message: message, Attempts: 0}
 
 		sendJSONResponse(w, EnqueueResponse{
 			Ok:        true,
-			QueueSize: len(appQueue),
+			QueueSize: len(appQueue.Queue),
 		})
 	}
 }
