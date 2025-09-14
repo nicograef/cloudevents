@@ -15,7 +15,7 @@ import (
 func main() {
 	cfg := config.Load()
 
-	appDatabase, err := database.LoadFromJSONFile()
+	appDatabase, err := database.LoadFromJSONFile(cfg.DataDir)
 	if err != nil {
 		fmt.Println("No existing database found, creating a new one.")
 		appDatabase = database.New()
@@ -36,7 +36,7 @@ func main() {
 	go func() {
 		<-sigs
 		fmt.Println("Signal received, persisting database...")
-		if err := appDatabase.PersistToJsonFile(); err != nil {
+		if err := appDatabase.PersistToJsonFile(cfg.DataDir); err != nil {
 			fmt.Println("Error persisting database:", err)
 		}
 		os.Exit(0)
@@ -45,7 +45,7 @@ func main() {
 	err = server.ListenAndServe()
 	if err != nil {
 		fmt.Println("Server error:", err)
-		if persistErr := appDatabase.PersistToJsonFile(); persistErr != nil {
+		if persistErr := appDatabase.PersistToJsonFile(cfg.DataDir); persistErr != nil {
 			fmt.Println("Error persisting database:", persistErr)
 		}
 		panic(err)

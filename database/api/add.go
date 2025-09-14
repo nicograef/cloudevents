@@ -45,6 +45,8 @@ func NewAddEventHandler(db database.Database) http.HandlerFunc {
 			return
 		}
 
+		log.Printf("INFO Added event to database: %s", event.ID)
+
 		sendJSONResponse(w, AddEventResponseSuccess{
 			Ok:    true,
 			Event: *event,

@@ -8,17 +8,30 @@ import (
 
 // Config holds application configuration values loaded from environment variables.
 type Config struct {
-	Port int // Port for the HTTP server
+	Port    int    // Port for the HTTP server
+	DataDir string // Directory for data persistence
 }
 
 // Load reads configuration from environment variables and returns a Config struct.
-// Defaults: PORT=5000s
+// Defaults: PORT=5000, DATA_DIR=current directory
 func Load() Config {
 	port := parseEnvInt("PORT", 5000)
+	dataDir := parseEnvString("DATA_DIR", ".")
 
 	return Config{
-		Port: port,
+		Port:    port,
+		DataDir: dataDir,
 	}
+}
+
+// parseEnvString reads an environment variable by name and returns its value, or the provided default if unset.
+func parseEnvString(name, defaultValue string) string {
+	v := os.Getenv(name)
+	if v == "" {
+		return defaultValue
+	}
+
+	return v
 }
 
 // parseEnvInt reads an environment variable by name and converts it to int.

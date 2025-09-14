@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/google/uuid"
 	"github.com/nicograef/cloudevents/event"
@@ -12,8 +13,9 @@ import (
 // LoadFromJSONFile loads the database state from a JSON file on disk.
 // If the file does not exist or cannot be read, an error is returned.
 // The indexes are rebuilt after loading the events.
-func LoadFromJSONFile() (*Database, error) {
-	file, err := os.Open("database.json")
+func LoadFromJSONFile(dataDir string) (*Database, error) {
+	filePath := filepath.Join(dataDir, "database.json")
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +48,9 @@ func LoadFromJSONFile() (*Database, error) {
 // PersistToJsonFile saves the current state of the database to the disk.
 // The events are stored as an array in a JSON format for easy parsing.
 // The indexes are not persisted to save space and can be rebuilt on load.
-func (db *Database) PersistToJsonFile() error {
-	file, err := os.Create("database.json")
+func (db *Database) PersistToJsonFile(dataDir string) error {
+	filePath := filepath.Join(dataDir, "database.json")
+	file, err := os.Create(filePath)
 	if err != nil {
 		return err
 	}

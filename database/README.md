@@ -22,6 +22,7 @@
 
 ```bash
 docker run \
+	-e DATA_DIR=/data \
 	-p 5000:5000 \
 	-v $(pwd)/data:/data \
 	--name eventdb github.com/nicograef/cloudevents/database
@@ -33,13 +34,86 @@ docker run \
 go run .
 ```
 
+The server will start on port 5000 by default. You can customize the port and data directory using environment variables:
+
+```sh
+PORT=8080 go run .
+```
+
+```sh
+DATA_DIR=/path/to/data go run .
+```
+
+---
+
+## Configuration
+
+You can configure the database using environment variables:
+
+| Variable   | Default | Description                    |
+|------------|---------|--------------------------------|
+| `PORT`     | `5000`  | Port for HTTP server           |
+| `DATA_DIR` | `.`     | Directory for data persistence |
+
 ---
 
 ## API Documentation
 
-The database provides a Go API for event storage and retrieval:
+The database provides both a Go API and HTTP API for event storage and retrieval.
 
-### Add Event
+### HTTP API
+
+#### Add Event
+
+**POST /add**
+
+**Content-Type:** `application/json`
+
+**Payload Example:**
+
+```json
+{
+  "type": "com.example.user.created:v1",
+  "source": "https://api.example.com",
+  "subject": "/users/12345",
+  "data": {
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+}
+```
+
+**Success Response:**
+
+```json
+{
+  "ok": true,
+  "event": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "type": "com.example.user.created:v1",
+    "time": "2025-09-14T12:34:56Z",
+    "source": "https://api.example.com",
+    "subject": "/users/12345",
+    "data": {
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+  }
+}
+```
+
+**Error Response:**
+
+```json
+{
+  "ok": false,
+  "error": "event type must be at least 5 characters long"
+}
+```
+
+### Go API
+
+#### Add Event
 
 ```go
 import "github.com/nicograef/cloudevents/event"
@@ -53,10 +127,10 @@ candidate := event.EventCandidate{
 }
 
 // Add to database
-eventID, err := db.AddEvent(candidate)
+event, err := db.AddEvent(candidate)
 ```
 
-### Retrieve Events
+#### Retrieve Events
 
 ```go
 // Get event by ID
@@ -72,7 +146,7 @@ userEvents := db.GetEventsByType("com.example.user.created:v1")
 subjectEvents := db.GetEventsBySubject("/users/12345")
 ```
 
-### Persistence
+#### Persistence
 
 ```go
 // Save to JSON file
@@ -98,6 +172,43 @@ Events follow the CloudEvents specification:
   "data": {
     "name": "John Doe",
     "email": "john@example.com"
+  }
+}
+```
+
+---
+
+## Example: Add Event with curl
+
+```sh
+curl -X POST http://localhost:5000/add \
+    -H "Content-Type: application/json" \
+    -d '{
+        "type": "com.example.user.created:v1",
+        "source": "https://api.example.com",
+        "subject": "/users/12345",
+        "data": {
+            "name": "John Doe",
+            "email": "john@example.com"
+        }
+    }'
+```
+
+**Response:**
+
+```json
+{
+  "ok": true,
+  "event": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "type": "com.example.user.created:v1",
+    "time": "2025-09-14T12:34:56Z",
+    "source": "https://api.example.com",
+    "subject": "/users/12345",
+    "data": {
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
   }
 }
 ```
@@ -135,58 +246,13 @@ docker build -t github.com/nicograef/cloudevents/database .
 ### Run Docker Container
 
 ```sh
-docker run -p 5000:5000 github.com/nicograef/cloudevents/database
+docker run -p 5000:5000 -e DATA_DIR=/data -v $(pwd)/data:/data --name database github.com/nicograef/cloudevents/database
 ```
 
 ### Run Tests
 
 ```sh
 go test ./...
-```
-
----
-
-## Example Usage
-
-```go
-package main
-
-import (
-    "fmt"
-    "github.com/nicograef/cloudevents/database/database"
-    "github.com/nicograef/cloudevents/event"
-)
-
-func main() {
-    // Create a new database
-    db := database.New()
-
-    // Add some events
-    userCreated := event.EventCandidate{
-        Type:    "com.example.user.created:v1",
-        Source:  "https://api.example.com",
-        Subject: "/users/12345",
-        Data:    map[string]interface{}{"name": "John Doe"},
-    }
-
-    eventID, err := db.AddEvent(userCreated)
-    if err != nil {
-        panic(err)
-    }
-
-    // Retrieve the event
-    storedEvent := db.GetEvent(*eventID)
-    fmt.Printf("Stored event: %+v\n", storedEvent)
-
-    // Get all user events
-    userEvents := db.GetEventsByType("com.example.user.created:v1")
-    fmt.Printf("Found %d user events\n", len(userEvents))
-
-    // Persist to disk
-    if err := db.PersistToJsonFile(); err != nil {
-        panic(err)
-    }
-}
 ```
 
 ---

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "897fa863-7cba-4076-9cda-363f3fbda113",
+    "type": "com.example.user.created:v1",
+    "time": "2025-09-14T17:01:52.975145879Z",
+    "source": "https://api.example.com",
+    "subject": "/users/12345",
+    "data": { "email": "john@example.com", "name": "John Doe" }
+  },
+  {
+    "id": "a2ada829-afa4-4983-9297-0d80972df7a8",
+    "type": "com.example.user.created:v1",
+    "time": "2025-09-14T17:08:05.862237094Z",
+    "source": "https://api.example.com",
+    "subject": "/users/12345",
+    "data": { "email": "john@example.com", "name": "John Doe" }
+  }
+]

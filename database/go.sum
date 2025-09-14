@@ -1,2 +1,4 @@
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/nicograef/cloudevents/event v0.0.0-20250914161956-f5e279343ea2 h1:ypzWIFNdCAJdt3AiNedo4RDGHjGWFbyARbIEG0Y0kv0=
+github.com/nicograef/cloudevents/event v0.0.0-20250914161956-f5e279343ea2/go.mod h1:pJtCJXo8CKzaWE/CwMO+wg+kgCQjNTB7KBPWHMQ6G7o=

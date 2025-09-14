@@ -26,7 +26,7 @@ func TestPersistToJsonFile(t *testing.T) {
 		t.Fatal("Failed to add event:", err)
 	}
 
-	if err := db.PersistToJsonFile(); err != nil {
+	if err := db.PersistToJsonFile("."); err != nil {
 		t.Fatal("Failed to persist to JSON file:", err)
 	}
 }
@@ -40,7 +40,7 @@ func TestLoadDatabaseFromJsonFile(t *testing.T) {
 	}
 	defer os.Remove("database.json")
 
-	db, err := LoadFromJSONFile()
+	db, err := LoadFromJSONFile(".")
 	if err != nil {
 		t.Fatal("Failed to load database from JSON file:", err)
 	}
