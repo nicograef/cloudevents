@@ -11,8 +11,8 @@ func TestLoad_Defaults(t *testing.T) {
 	if cfg.Port != 3000 {
 		t.Errorf("expected default port 3000, got %d", cfg.Port)
 	}
-	if cfg.QueueSize != 1000 {
-		t.Errorf("expected default queue size 1000, got %d", cfg.QueueSize)
+	if cfg.Capacity != 1000 {
+		t.Errorf("expected default queue size 1000, got %d", cfg.Capacity)
 	}
 	if cfg.ConsumerUrl != "http://localhost:4000" {
 		t.Errorf("expected default consumerUrl, got %s", cfg.ConsumerUrl)
@@ -27,8 +27,8 @@ func TestLoad_EnvValues(t *testing.T) {
 	if cfg.Port != 8080 {
 		t.Errorf("expected port 8080, got %d", cfg.Port)
 	}
-	if cfg.QueueSize != 42 {
-		t.Errorf("expected queue size 42, got %d", cfg.QueueSize)
+	if cfg.Capacity != 42 {
+		t.Errorf("expected queue size 42, got %d", cfg.Capacity)
 	}
 	if cfg.ConsumerUrl != "http://test/webhook" {
 		t.Errorf("expected consumerUrl http://test/webhook, got %s", cfg.ConsumerUrl)
@@ -42,7 +42,7 @@ func TestLoad_InvalidInt(t *testing.T) {
 	if cfg.Port != 3000 {
 		t.Errorf("expected fallback port 3000, got %d", cfg.Port)
 	}
-	if cfg.QueueSize != 1000 {
-		t.Errorf("expected fallback queue size 1000, got %d", cfg.QueueSize)
+	if cfg.Capacity != 1000 {
+		t.Errorf("expected fallback queue size 1000, got %d", cfg.Capacity)
 	}
 }

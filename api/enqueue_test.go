@@ -15,8 +15,7 @@ func TestNewEnqueueHandler_Success(t *testing.T) {
 	handler := NewEnqueueHandler(queue)
 
 	msg := core.Message{Type: "test"}
-	payload := EnqueueRequest{Message: msg}
-	body, _ := json.Marshal(payload)
+	body, _ := json.Marshal(msg)
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()
 
@@ -26,9 +25,14 @@ func TestNewEnqueueHandler_Success(t *testing.T) {
 		t.Errorf("expected status 200, got %d", rec.Code)
 	}
 	var resp EnqueueResponse
-	json.NewDecoder(rec.Body).Decode(&resp)
+	if err := json.NewDecoder(rec.Body).Decode(&resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 	if !resp.Ok {
 		t.Errorf("expected ok response, got %+v", resp)
+	}
+	if resp.QueueSize != 1 {
+		t.Errorf("expected QueueSize 1, got %d", resp.QueueSize)
 	}
 	select {
 	case got := <-queue:

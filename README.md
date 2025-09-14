@@ -22,7 +22,7 @@
 
 ```bash
 docker run \
-	-e QUEUE_SIZE=1000 \
+	-e CAPACITY=1000 \
 	-e CONSUMER_URL=http://localhost:4000 \
 	-p 3000:3000 \
 	--name qugo github.com/nicograef/qugo
@@ -31,7 +31,7 @@ docker run \
 ### Run Locally
 
 ```sh
-QUEUE_SIZE=1000 CONSUMER_URL=http://localhost:4000 go run .
+CAPACITY=1000 CONSUMER_URL=http://localhost:4000 go run .
 ```
 
 ---
@@ -40,17 +40,17 @@ QUEUE_SIZE=1000 CONSUMER_URL=http://localhost:4000 go run .
 
 You can configure Qugo using environment variables or CLI flags:
 
-| Variable       | Default                 | Description                    |
-| -------------- | ----------------------- | ------------------------------ |
-| `PORT`         | `3000`                  | Port for HTTP server           |
-| `QUEUE_SIZE`   | `1000`                  | Max number of queued messages  |
-| `CONSUMER_URL` | `http://localhost:4000` | Webhook URL for event delivery |
+| Variable        | Default                  | Description                       |
+|----------------|-------------------------|-----------------------------------|
+| `PORT`         | `3000`                   | Port for HTTP server              |
+| `CAPACITY`     | `1000`                   | Max number of queued messages     |
+| `CONSUMER_URL` | `http://localhost:4000`  | Webhook URL for event delivery    |
 
 ---
 
 ## API Documentation
 
-### Enqueue Event
+### Enqueue event message
 
 **POST /**
 
@@ -60,23 +60,19 @@ You can configure Qugo using environment variables or CLI flags:
 
 ```json
 {
-  "message": {
-    "id": "<uuid>",
-    "type": "com.example.event:v1",
-    "time": "2025-09-14T12:34:56Z",
-    "source": "https://example.com",
-    "subject": "/users/12345",
-    "data": { "payload": "this is some data" }
-  }
+  "id": "b8e7c2e2-1f4a-4c2e-9c3a-8f7d2b6e4a1f",
+  "type": "com.example.event:v1",
+  "time": "2025-09-14T12:34:56Z",
+  "source": "https://example.com",
+  "subject": "/users/12345",
+  "data": { "payload": "this is some data" }
 }
 ```
 
 **Response:**
 
 ```json
-{
-  "ok": true
-}
+{ "ok": true, "queueSize": 1 }
 ```
 
 ---
@@ -113,18 +109,16 @@ go test ./...
 ## Example: Enqueue a Message
 
 ```sh
-curl -X POST localhost:3000 \
-	-H "Content-Type: application/json" \
-	-d '{
-		"message": {
-            "id": "b8e7c2e2-1f4a-4c2e-9c3a-8f7d2b6e4a1f",
-            "time": "2024-06-13T00:00:00Z",
-            "type": "com.example.event:v1",
-            "source": "https://example.com",
-            "subject": "/users/12345",
-            "data": { "payload": "this is some data" }
-		}
-	}'
+curl -X POST http://localhost:3000 \
+    -H "Content-Type: application/json" \
+    -d '{
+        "id": "b8e7c2e2-1f4a-4c2e-9c3a-8f7d2b6e4a1f",
+        "type": "com.example.event:v1",
+        "time": "2024-06-13T00:00:00Z",
+        "source": "https://example.com",
+        "subject": "/users/12345",
+        "data": { "payload": "this is some data" }
+    }'
 ```
 
 ---

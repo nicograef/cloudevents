@@ -23,7 +23,7 @@ func main() {
 		Addr: fmt.Sprintf(":%d", cfg.Port),
 	}
 
-	queue := make(chan core.Message, cfg.QueueSize)
+	queue := make(chan core.Message, cfg.Capacity)
 
 	http.HandleFunc("/", api.NewEnqueueHandler(queue))
 

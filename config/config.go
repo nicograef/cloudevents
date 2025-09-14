@@ -9,20 +9,20 @@ import (
 // Config holds application configuration values loaded from environment variables.
 type Config struct {
 	Port        int    // Port for the HTTP server
-	QueueSize   int    // Maximum number of messages in the queue
+	Capacity    int    // Maximum number of messages in the queue
 	ConsumerUrl string // Webhook URL to deliver messages
 }
 
 // Load reads configuration from environment variables and returns a Config struct.
-// Defaults: PORT=3000 QUEUE_SIZE=1000, CONSUMER_URL="http://localhost:4000"
+// Defaults: PORT=3000 CAPACITY=1000, CONSUMER_URL="http://localhost:4000"
 func Load() Config {
 	port := parseEnvInt("PORT", 3000)
-	queueSize := parseEnvInt("QUEUE_SIZE", 1000)
+	capacity := parseEnvInt("CAPACITY", 1000)
 	consumerURL := parseEnvString("CONSUMER_URL", "http://localhost:4000")
 
 	return Config{
 		Port:        port,
-		QueueSize:   queueSize,
+		Capacity:    capacity,
 		ConsumerUrl: consumerURL,
 	}
 }

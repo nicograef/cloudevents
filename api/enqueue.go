@@ -6,15 +6,10 @@ import (
 	"github.com/nicograef/qugo/core"
 )
 
-// EnqueueRequest represents the expected payload for the enqueue API endpoint.
-type EnqueueRequest struct {
-	Message core.Message `json:"message"`
-}
-
 // EnqueueResponse represents the response from the enqueue API endpoint.
 type EnqueueResponse struct {
-	Ok    bool   `json:"ok"`
-	Error string `json:"error,omitempty"`
+	Ok        bool `json:"ok"`
+	QueueSize int  `json:"queueSize"`
 }
 
 // NewEnqueueHandler returns an HTTP handler for enqueuing messages into the queue.
@@ -25,15 +20,16 @@ func NewEnqueueHandler(appQueue chan core.Message) http.HandlerFunc {
 			return
 		}
 
-		requestBody := EnqueueRequest{}
-		if !readJSONRequest(w, r, &requestBody) {
+		message := core.Message{}
+		if !readJSONRequest(w, r, &message) {
 			return
 		}
 
-		appQueue <- requestBody.Message
+		appQueue <- message
 
 		sendJSONResponse(w, EnqueueResponse{
-			Ok: true,
+			Ok:        true,
+			QueueSize: len(appQueue),
 		})
 	}
 }
