@@ -10,7 +10,7 @@ import (
 type Config struct {
 	Port        int    // Port for the HTTP server
 	Capacity    int    // Maximum number of messages in the queue
-	ConsumerUrl string // Webhook URL to deliver messages
+	ConsumerURL string // Webhook URL to deliver messages
 }
 
 // Load reads configuration from environment variables and returns a Config struct.
@@ -18,12 +18,12 @@ type Config struct {
 func Load() Config {
 	port := parseEnvInt("PORT", 3000)
 	capacity := parseEnvInt("CAPACITY", 1000)
-	consumerURL := parseEnvString("CONSUMER_URL", "http://localhost:4000")
+	ConsumerURL := parseEnvString("CONSUMER_URL", "http://localhost:4000")
 
 	return Config{
 		Port:        port,
 		Capacity:    capacity,
-		ConsumerUrl: consumerURL,
+		ConsumerURL: ConsumerURL,
 	}
 }
 

@@ -14,8 +14,8 @@ func TestLoad_Defaults(t *testing.T) {
 	if cfg.Capacity != 1000 {
 		t.Errorf("expected default queue size 1000, got %d", cfg.Capacity)
 	}
-	if cfg.ConsumerUrl != "http://localhost:4000" {
-		t.Errorf("expected default consumerUrl, got %s", cfg.ConsumerUrl)
+	if cfg.ConsumerURL != "http://localhost:4000" {
+		t.Errorf("expected default ConsumerURL, got %s", cfg.ConsumerURL)
 	}
 }
 
@@ -30,8 +30,8 @@ func TestLoad_EnvValues(t *testing.T) {
 	if cfg.Capacity != 42 {
 		t.Errorf("expected queue size 42, got %d", cfg.Capacity)
 	}
-	if cfg.ConsumerUrl != "http://test/webhook" {
-		t.Errorf("expected consumerUrl http://test/webhook, got %s", cfg.ConsumerUrl)
+	if cfg.ConsumerURL != "http://test/webhook" {
+		t.Errorf("expected ConsumerURL http://test/webhook, got %s", cfg.ConsumerURL)
 	}
 }
 

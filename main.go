@@ -35,7 +35,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		for msg := range queue {
-			resp, err := core.SendToWebhook(cfg.ConsumerUrl, msg)
+			resp, err := core.SendToWebhook(cfg.ConsumerURL, msg)
 			if err != nil {
 				log.Printf("Error sending to webhook: %v", err)
 			} else {
