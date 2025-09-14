@@ -44,7 +44,7 @@ func LoadFromJSONFile() (*Database, error) {
 }
 
 // PersistToJsonFile saves the current state of the database to the disk.
-// The events are stored in a JSON format for easy parsing.
+// The events are stored as an array in a JSON format for easy parsing.
 // The indexes are not persisted to save space and can be rebuilt on load.
 func (db *Database) PersistToJsonFile() error {
 	file, err := os.Create("database.json")
@@ -58,8 +58,15 @@ func (db *Database) PersistToJsonFile() error {
 		}
 	}()
 
+	// convert map to slice for easier JSON encoding
+	events := make([]event.Event, 0, len(db.Events))
+	for _, e := range db.Events {
+		events = append(events, e)
+	}
+
+	// Encode the events slice to JSON and write to file
 	encoder := json.NewEncoder(file)
-	if err := encoder.Encode(db.Events); err != nil {
+	if err := encoder.Encode(events); err != nil {
 		return err
 	}
 
