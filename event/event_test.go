@@ -8,7 +8,13 @@ import (
 )
 
 func TestNew_Success(t *testing.T) {
-	e, err := New("com.example.event:v1", "https://example.com", "/users/123", map[string]any{"k": "v"})
+	candidate := EventCandidate{
+		Type:    "com.example.event:v1",
+		Source:  "https://example.com",
+		Subject: "/users/123",
+		Data:    map[string]any{"k": "v"},
+	}
+	e, err := New(candidate)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}

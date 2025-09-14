@@ -25,14 +25,28 @@ type Event struct {
 	Data any `json:"data"`
 }
 
-func New(eventType, source, subject string, data any) (*Event, error) {
+// EventCandidate represents the input required to create a new Event.
+type EventCandidate struct {
+	// The type of event related to the source system and subject. E.g. com.library.book.borrowed:v1
+	Type string `json:"type"`
+	// The source of the event. Must be a valid URI-Reference. E.g. https://library.example.com
+	Source string `json:"source"`
+	// The subject of the event in the context of the event producer (identified by source). E.g. the entity to which the event is primarily related. E.g. /users/12345"
+	Subject string `json:"subject"`
+	// The event payload.
+	Data any `json:"data"`
+}
+
+// New creates a new Event with the given parameters and automatically sets the ID and Time fields.
+// It returns an error if any of the required fields are invalid.
+func New(candidate EventCandidate) (*Event, error) {
 	event := Event{
 		ID:      uuid.New(),
-		Type:    eventType,
+		Type:    candidate.Type,
 		Time:    time.Now().UTC(),
-		Source:  source,
-		Subject: subject,
-		Data:    data,
+		Source:  candidate.Source,
+		Subject: candidate.Subject,
+		Data:    candidate.Data,
 	}
 
 	if err := event.Validate(); err != nil {
