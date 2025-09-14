@@ -146,18 +146,6 @@ userEvents := db.GetEventsByType("com.example.user.created:v1")
 subjectEvents := db.GetEventsBySubject("/users/12345")
 ```
 
-#### Persistence
-
-```go
-// Save to JSON file
-err := db.PersistToJsonFile()
-
-// Load from JSON file
-db, err := database.LoadFromJSONFile()
-```
-
----
-
 ## Event Format
 
 Events follow the CloudEvents specification:
