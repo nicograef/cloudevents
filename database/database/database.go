@@ -100,6 +100,17 @@ func (db *Database) GetEventsBySubject(subject string) []event.Event {
 	return events
 }
 
+// RebuildIndexes reconstructs the indexes from the current events in the database
+func (db *Database) RebuildIndexes() {
+	db.TypeIndex = make(map[string][]uuid.UUID)
+	db.SubjectIndex = make(map[string][]uuid.UUID)
+
+	for id, event := range db.Events {
+		db.TypeIndex[event.Type] = append(db.TypeIndex[event.Type], id)
+		db.SubjectIndex[event.Subject] = append(db.SubjectIndex[event.Subject], id)
+	}
+}
+
 // sortEventsByTime sorts events by their timestamp
 func sortEventsByTime(events []event.Event) {
 	sort.Slice(events, func(i, j int) bool {

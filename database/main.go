@@ -15,7 +15,7 @@ func main() {
 		Addr: ":5000",
 	}
 
-	appDatabase, err := database.LoadDatabaseFromJsonFile()
+	appDatabase, err := database.LoadFromJSONFile()
 	if err != nil {
 		fmt.Println("No existing database found, creating a new one.")
 		appDatabase = database.New()
