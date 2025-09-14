@@ -37,11 +37,11 @@ func TestDatabaseCreation(t *testing.T) {
 
 func TestAddAndGetEvents(t *testing.T) {
 	db := New()
-	id1, err := db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
+	event1, err := db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
 	if err != nil {
 		t.Fatalf("AddEvent failed: %v", err)
 	}
-	id2, err := db.AddEvent(event.EventCandidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
+	event2, err := db.AddEvent(event.EventCandidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
 	if err != nil {
 		t.Fatalf("AddEvent failed: %v", err)
 	}
@@ -61,10 +61,10 @@ func TestAddAndGetEvents(t *testing.T) {
 		t.Fatal("Failed to get events")
 	}
 
-	if *id1 != events[0].ID {
+	if event1.ID != events[0].ID {
 		t.Fatal("Event ID is not the same as the one created")
 	}
-	if *id2 != events[1].ID {
+	if event2.ID != events[1].ID {
 		t.Fatal("Event ID is not the same as the one created")
 	}
 
@@ -85,7 +85,7 @@ func TestAddAndGetEvents(t *testing.T) {
 
 func TestGetEventByID(t *testing.T) {
 	db := New()
-	eventId, err := db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
+	event1, err := db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
 	if err != nil {
 		t.Fatalf("AddEvent failed: %v", err)
 	}
@@ -94,7 +94,7 @@ func TestGetEventByID(t *testing.T) {
 		t.Fatal("Expected no event to be found")
 	}
 
-	event := db.GetEvent(*eventId)
+	event := db.GetEvent(event1.ID)
 	if event == nil {
 		t.Fatal("Failed to get event by ID")
 	}

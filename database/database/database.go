@@ -22,7 +22,7 @@ func New() *Database {
 }
 
 // AddEvent adds a new event to the database and updates the indexes
-func (db *Database) AddEvent(candidate event.EventCandidate) (*uuid.UUID, error) {
+func (db *Database) AddEvent(candidate event.EventCandidate) (*event.Event, error) {
 	event, err := event.New(candidate)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (db *Database) AddEvent(candidate event.EventCandidate) (*uuid.UUID, error)
 	db.TypeIndex[event.Type] = append(db.TypeIndex[event.Type], event.ID)
 	db.SubjectIndex[event.Subject] = append(db.SubjectIndex[event.Subject], event.ID)
 
-	return &event.ID, nil
+	return event, nil
 }
 
 // GetEvent retrieves an event by its ID

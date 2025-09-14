@@ -7,13 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/nicograef/cloudevents/database/api"
+	"github.com/nicograef/cloudevents/database/config"
 	"github.com/nicograef/cloudevents/database/database"
 )
 
 func main() {
-	server := &http.Server{
-		Addr: ":5000",
-	}
+	cfg := config.Load()
 
 	appDatabase, err := database.LoadFromJSONFile()
 	if err != nil {
@@ -22,6 +22,12 @@ func main() {
 	} else {
 		fmt.Println("Loaded existing database from file.")
 	}
+
+	server := &http.Server{
+		Addr: fmt.Sprintf(":%d", cfg.Port),
+	}
+
+	http.HandleFunc("/add", api.NewAddEventHandler(*appDatabase))
 
 	// Set up signal handling for graceful shutdown
 	sigs := make(chan os.Signal, 1)
