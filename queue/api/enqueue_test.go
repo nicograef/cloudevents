@@ -15,7 +15,7 @@ func TestNewEnqueueHandler_Success(t *testing.T) {
 	q := &queue.Queue{Queue: make(chan queue.QueueMessage, 1)}
 	handler := NewEnqueueHandler(*q)
 
-	e, err := event.New("com.example.event:v1", "https://example.com", "/users/123", map[string]any{"k": "v"})
+	e, err := event.New(event.EventCandidate{Type: "com.example.event:v1", Source: "https://example.com", Subject: "/users/123", Data: map[string]any{"k": "v"}})
 	if err != nil {
 		t.Fatalf("failed to create event: %v", err)
 	}

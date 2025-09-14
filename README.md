@@ -228,17 +228,46 @@ curl -X POST http://localhost:5000/add \
 
 ## 🧪 Testing
 
+### Local Testing
+
 Run tests across all modules:
 
 ```bash
-# Test all modules
+# Using Make (recommended)
+make test
+
+# Test all modules manually
 find . -name "go.mod" -execdir go test ./... \;
 
 # Test individual modules
 cd event && go test ./...
 cd database && go test ./...
 cd queue && go test ./...
+
+# Run integration tests
+make integration-test
 ```
+
+### Continuous Integration
+
+The repository uses GitHub Actions for automated testing with smart path-based triggering:
+
+- **Module-specific CI**: Only runs tests for modules that have changes
+- **Integration tests**: Runs when multiple modules change
+- **Security scanning**: Weekly dependency and vulnerability checks
+- **Automated releases**: Builds and publishes Docker images on tags
+
+**CI Workflows:**
+- `ci.yml` - Main CI pipeline with path filters
+- `security.yml` - Security scanning and dependency checks  
+- `release.yml` - Automated releases with Docker images
+
+**Workflow triggers:**
+- Changes to `event/` → Event module CI
+- Changes to `database/` → Database module CI + Docker build
+- Changes to `queue/` → Queue module CI + Docker build
+- Multiple module changes → Integration tests
+- Tagged releases → Automated release with binaries and Docker images
 
 ---
 

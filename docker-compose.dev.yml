@@ -1,0 +1,37 @@
+version: '3.8'
+
+# Development overrides
+services:
+  database:
+    build:
+      context: ./database
+      target: builder  # Use builder stage for development
+    volumes:
+      - ./database:/app
+      - database_data:/data
+    environment:
+      - PORT=5000
+      - DATA_DIR=/data
+      - GO_ENV=development
+    command: ["go", "run", "."]
+
+  queue:
+    build:
+      context: ./queue
+      target: builder  # Use builder stage for development
+    volumes:
+      - ./queue:/app
+    environment:
+      - PORT=3000
+      - CAPACITY=1000
+      - CONSUMER_URL=http://webhook-consumer:4000
+      - GO_ENV=development
+    command: ["go", "run", "."]
+
+  # Development webhook consumer that logs requests
+  webhook-consumer:
+    image: httpbin/httpbin
+    ports:
+      - "4000:80"
+    environment:
+      - GUNICORN_CMD_ARGS=--bind=0.0.0.0:80
