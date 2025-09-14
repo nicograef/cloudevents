@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -36,9 +37,9 @@ func main() {
 		for msg := range queue {
 			resp, err := core.SendToWebhook(cfg.ConsumerUrl, msg)
 			if err != nil {
-				fmt.Printf("Error sending to webhook: %v\n", err)
+				log.Printf("Error sending to webhook: %v", err)
 			} else {
-				fmt.Printf("Webhook response: %s\n", resp)
+				log.Printf("Webhook response: %s", resp)
 			}
 		}
 	}()
@@ -49,18 +50,18 @@ func main() {
 
 	go func() {
 		<-sigs
-		fmt.Println("Signal received, shutting down...")
+		log.Println("Signal received, shutting down...")
 		// Gracefully shutdown HTTP server
 		ctx, cancel := context.WithTimeout(context.Background(), 5_000_000_000) // 5s
 		defer cancel()
 		if err := server.Shutdown(ctx); err != nil {
-			fmt.Printf("HTTP server Shutdown: %v\n", err)
+			log.Printf("HTTP server Shutdown: %v", err)
 		}
 		// Close queue channel to stop consumer
 		close(queue)
 		// Wait for consumer goroutine to finish
 		wg.Wait()
-		fmt.Println("Shutdown complete.")
+		log.Println("Shutdown complete.")
 		os.Exit(0)
 	}()
 
