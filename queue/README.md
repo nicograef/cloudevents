@@ -1,6 +1,6 @@
-# qugo
+# queue
 
-**Qugo** is a message queue for event-driven applications, written in Go. It follows the [CNCF Cloudevents specification](https://cloudevents.io) and is designed to receive event messages via HTTP, queue them, and deliver them to a configured webhook. Qugo uses Go channels to decouple producers and consumers, ensuring reliable delivery and easy integration.
+**Queue** is a message queue for event-driven applications, written in Go. It follows the [CNCF Cloudevents specification](https://cloudevents.io) and is designed to receive event messages via HTTP, queue them, and deliver them to a configured webhook. Qugo uses Go channels to decouple producers and consumers, ensuring reliable delivery and easy integration.
 
 ---
 
@@ -25,7 +25,7 @@ docker run \
 	-e CAPACITY=1000 \
 	-e CONSUMER_URL=http://localhost:4000 \
 	-p 3000:3000 \
-	--name qugo github.com/nicograef/qugo
+	--name queue github.com/nicograef/queue
 ```
 
 ### Run Locally
@@ -82,20 +82,20 @@ You can configure Qugo using environment variables or CLI flags:
 ### Build & Run
 
 ```sh
-go build -o qugo .
-./qugo
+go build -o queue .
+./queue
 ```
 
 ### Build Docker Image
 
 ```sh
-docker build -t github.com/nicograef/qugo .
+docker build -t github.com/nicograef/queue .
 ```
 
 ### Run Docker Container
 
 ```sh
-docker run -p 3000:3000 github.com/nicograef/qugo
+docker run -p 3000:3000 github.com/nicograef/queue
 ```
 
 ### Run Tests

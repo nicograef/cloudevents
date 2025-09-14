@@ -11,12 +11,12 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -o /go/bin/qugo ./main.go
+RUN go build -o /go/bin/queue ./main.go
 
 # --- Deploy Stage ---
 FROM alpine:latest
 
-COPY --from=builder /go/bin/qugo /usr/local/bin/qugo
+COPY --from=builder /go/bin/queue /usr/local/bin/queue
 
-ENTRYPOINT [ "qugo" ]
+ENTRYPOINT [ "queue" ]
 

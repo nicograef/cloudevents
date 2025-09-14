@@ -2,16 +2,18 @@ package queue
 
 import (
 	"testing"
+
+	"github.com/nicograef/cloudevents/event"
 )
 
 func TestHandleQueueItem_Success(t *testing.T) {
 	q := NewQueue(1)
 	called := false
-	sendFunc := func(url string, msg Message) (string, error) {
+	sendFunc := func(url string, msg event.Event) (string, error) {
 		called = true
 		return "ok", nil
 	}
-	item := QueueMessage{Message: Message{Type: "success"}, Attempts: 0}
+	item := QueueMessage{Message: event.Event{Type: "success"}, Attempts: 0}
 	q.HandleQueueItem(item, "http://test", sendFunc)
 	if !called {
 		t.Errorf("sendFunc was not called")
@@ -29,11 +31,11 @@ func TestHandleQueueItem_Success(t *testing.T) {
 func TestHandleQueueItem_RetryAndMaxAttempts(t *testing.T) {
 	q := NewQueue(1)
 	attempts := 0
-	sendFunc := func(url string, msg Message) (string, error) {
+	sendFunc := func(url string, msg event.Event) (string, error) {
 		attempts++
 		return "", assertError("fail")
 	}
-	item := QueueMessage{Message: Message{Type: "fail"}, Attempts: 0}
+	item := QueueMessage{Message: event.Event{Type: "fail"}, Attempts: 0}
 	q.HandleQueueItem(item, "http://test", sendFunc)
 	// Should be re-enqueued with Attempts=1
 	var retried QueueMessage

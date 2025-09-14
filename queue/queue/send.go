@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+
+	"github.com/nicograef/cloudevents/event"
 )
 
 // SendToWebhook posts the message to the consumer webhook and returns the response body or error
-func SendToWebhook(url string, msg Message) (string, error) {
+func SendToWebhook(url string, msg event.Event) (string, error) {
 	importBytes, err := json.Marshal(msg)
 	if err != nil {
 		return "", err

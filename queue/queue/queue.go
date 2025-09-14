@@ -2,10 +2,12 @@ package queue
 
 import (
 	"log"
+
+	"github.com/nicograef/cloudevents/event"
 )
 
 type QueueMessage struct {
-	Message  Message
+	Message  event.Event
 	Attempts int
 }
 
@@ -21,7 +23,7 @@ func NewQueue(capacity int) Queue {
 // StartConsumer starts a goroutine that reads from the queue and calls the webhook for each message.
 // It takes the queue, consumerURL, and a WaitGroup pointer.
 // SendFunc defines the signature for sending a message to a webhook.
-type SendFunc func(url string, msg Message) (string, error)
+type SendFunc func(url string, msg event.Event) (string, error)
 
 func (q *Queue) HandleQueueItem(item QueueMessage, consumerURL string, sendFunc SendFunc) {
 	resp, err := sendFunc(consumerURL, item.Message)

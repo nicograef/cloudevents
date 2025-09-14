@@ -1,4 +1,4 @@
-module github.com/nicograef/qugo
+module github.com/nicograef/cloudevents/event
 
 go 1.24.5
 

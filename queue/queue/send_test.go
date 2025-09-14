@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/nicograef/cloudevents/event"
 )
 
 func TestSendToWebhook_Success(t *testing.T) {
@@ -12,7 +14,7 @@ func TestSendToWebhook_Success(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	msg := Message{Type: "test"}
+	msg := event.Event{Type: "test"}
 	resp, err := SendToWebhook(ts.URL, msg)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -23,7 +25,7 @@ func TestSendToWebhook_Success(t *testing.T) {
 }
 
 func TestSendToWebhook_BadURL(t *testing.T) {
-	msg := Message{Type: "test"}
+	msg := event.Event{Type: "test"}
 	_, err := SendToWebhook("http://bad url", msg)
 	if err == nil {
 		t.Errorf("expected error for bad url")

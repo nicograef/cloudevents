@@ -11,9 +11,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/nicograef/qugo/api"
-	"github.com/nicograef/qugo/config"
-	"github.com/nicograef/qugo/queue"
+	"github.com/nicograef/cloudevents/queue/api"
+	"github.com/nicograef/cloudevents/queue/config"
+	"github.com/nicograef/cloudevents/queue/queue"
 )
 
 func main() {

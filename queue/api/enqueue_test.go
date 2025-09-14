@@ -7,15 +7,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/nicograef/qugo/queue"
+	"github.com/nicograef/cloudevents/event"
+	"github.com/nicograef/cloudevents/queue/queue"
 )
 
 func TestNewEnqueueHandler_Success(t *testing.T) {
 	q := &queue.Queue{Queue: make(chan queue.QueueMessage, 1)}
 	handler := NewEnqueueHandler(*q)
 
-	msg := queue.Message{Type: "test"}
-	body, _ := json.Marshal(msg)
+	e, err := event.New("com.example.event:v1", "https://example.com", "/users/123", map[string]any{"k": "v"})
+	if err != nil {
+		t.Fatalf("failed to create event: %v", err)
+	}
+	body, _ := json.Marshal(e)
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()
 
@@ -24,7 +28,7 @@ func TestNewEnqueueHandler_Success(t *testing.T) {
 	if rec.Code != http.StatusOK {
 		t.Errorf("expected status 200, got %d", rec.Code)
 	}
-	var resp EnqueueResponse
+	var resp EnqueueResponseSuccess
 	if err := json.NewDecoder(rec.Body).Decode(&resp); err != nil {
 		t.Fatalf("failed to decode response: %v", err)
 	}
@@ -36,8 +40,8 @@ func TestNewEnqueueHandler_Success(t *testing.T) {
 	}
 	select {
 	case got := <-q.Queue:
-		if got.Message.Type != "test" {
-			t.Errorf("expected message type 'test', got %s", got.Message.Type)
+		if got.Message.Type != "com.example.event:v1" {
+			t.Errorf("expected message type 'com.example.event:v1', got %s", got.Message.Type)
 		}
 		if got.Attempts != 0 {
 			t.Errorf("expected Attempts 0, got %d", got.Attempts)
