@@ -9,7 +9,7 @@ import (
 )
 
 // AddEventRequest represents the expected request body for the enqueue API endpoint.
-type AddEventRequest = event.EventCandidate
+type AddEventRequest = event.Candidate
 
 // AddEventResponseSuccess represents a successful response from the enqueue API endpoint.
 type AddEventResponseSuccess struct {
@@ -30,7 +30,7 @@ func NewAddEventHandler(db database.Database) http.HandlerFunc {
 			return
 		}
 
-		candidate := event.EventCandidate{}
+		candidate := event.Candidate{}
 		if !readJSONRequest(w, r, &candidate) {
 			return
 		}

@@ -16,7 +16,7 @@ func TestNewAddEventHandler_Success(t *testing.T) {
 	db := database.New()
 	handler := NewAddEventHandler(*db)
 
-	e := event.EventCandidate{Type: "com.example.event:v1", Source: "https://example.com", Subject: "/users/123", Data: map[string]any{"k": "v"}}
+	e := event.Candidate{Type: "com.example.event:v1", Source: "https://example.com", Subject: "/users/123", Data: map[string]any{"k": "v"}}
 	body, _ := json.Marshal(e)
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
 	rec := httptest.NewRecorder()

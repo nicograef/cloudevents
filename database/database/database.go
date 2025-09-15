@@ -22,7 +22,7 @@ func New() *Database {
 }
 
 // AddEvent adds a new event to the database and updates the indexes
-func (db *Database) AddEvent(candidate event.EventCandidate) (*event.Event, error) {
+func (db *Database) AddEvent(candidate event.Candidate) (*event.Event, error) {
 	event, err := event.New(candidate)
 	if err != nil {
 		return nil, err

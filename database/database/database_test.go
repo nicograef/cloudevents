@@ -37,11 +37,11 @@ func TestDatabaseCreation(t *testing.T) {
 
 func TestAddAndGetEvents(t *testing.T) {
 	db := New()
-	event1, err := db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
+	event1, err := db.AddEvent(event.Candidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
 	if err != nil {
 		t.Fatalf("AddEvent failed: %v", err)
 	}
-	event2, err := db.AddEvent(event.EventCandidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
+	event2, err := db.AddEvent(event.Candidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
 	if err != nil {
 		t.Fatalf("AddEvent failed: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestAddAndGetEvents(t *testing.T) {
 
 func TestGetEventByID(t *testing.T) {
 	db := New()
-	event1, err := db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
+	event1, err := db.AddEvent(event.Candidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
 	if err != nil {
 		t.Fatalf("AddEvent failed: %v", err)
 	}
@@ -112,9 +112,9 @@ func TestGetEventByID(t *testing.T) {
 
 func TestGetEventsByType(t *testing.T) {
 	db := New()
-	db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
-	db.AddEvent(event.EventCandidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
-	db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/2", Data: user{"ID": "2", "Name": "Max Mustermann"}})
+	db.AddEvent(event.Candidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
+	db.AddEvent(event.Candidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
+	db.AddEvent(event.Candidate{Type: "user.new", Source: "https://example.com", Subject: "/users/2", Data: user{"ID": "2", "Name": "Max Mustermann"}})
 
 	if nonExistingEvents := db.GetEventsByType("non-existing-type"); len(nonExistingEvents) != 0 {
 		t.Fatal("Expected no event to be found")
@@ -142,9 +142,9 @@ func TestGetEventsByType(t *testing.T) {
 
 func TestGetEventsBySubject(t *testing.T) {
 	db := New()
-	db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
-	db.AddEvent(event.EventCandidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
-	db.AddEvent(event.EventCandidate{Type: "user.new", Source: "https://example.com", Subject: "/users/2", Data: user{"ID": "2", "Name": "Max Mustermann"}})
+	db.AddEvent(event.Candidate{Type: "user.new", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Name": "John Doe"}})
+	db.AddEvent(event.Candidate{Type: "user.update", Source: "https://example.com", Subject: "/users/1", Data: user{"ID": "1", "Email": "john.doe@example.com"}})
+	db.AddEvent(event.Candidate{Type: "user.new", Source: "https://example.com", Subject: "/users/2", Data: user{"ID": "2", "Name": "Max Mustermann"}})
 
 	if nonExistingEvents := db.GetEventsBySubject("/non-existing"); len(nonExistingEvents) != 0 {
 		t.Fatal("Expected no event to be found")

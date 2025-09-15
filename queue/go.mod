@@ -2,6 +2,6 @@ module github.com/nicograef/cloudevents/queue
 
 go 1.24.5
 
-require github.com/nicograef/cloudevents/event v0.0.0-20250914161956-f5e279343ea2
+require github.com/nicograef/cloudevents/event v0.0.0-20250915202856-8554513e6fc0
 
 require github.com/google/uuid v1.6.0 // indirect

@@ -16,7 +16,7 @@ func TestPersistToJsonFile(t *testing.T) {
 		t.Fatal("Failed to create database")
 	}
 
-	_, err := db.AddEvent(event.EventCandidate{
+	_, err := db.AddEvent(event.Candidate{
 		Type:    "user.new",
 		Source:  "https://example.com",
 		Subject: "/users/1",

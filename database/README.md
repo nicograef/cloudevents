@@ -119,7 +119,7 @@ The database provides both a Go API and HTTP API for event storage and retrieval
 import "github.com/nicograef/cloudevents/event"
 
 // Create an event candidate
-candidate := event.EventCandidate{
+candidate := event.Candidate{
     Type:    "com.example.user.created:v1",
     Source:  "https://api.example.com",
     Subject: "/users/12345",
