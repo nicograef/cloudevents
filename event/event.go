@@ -25,8 +25,8 @@ type Event struct {
 	Data any `json:"data"`
 }
 
-// EventCandidate represents the input required to create a new Event.
-type EventCandidate struct {
+// Candidate represents the input required to create a new Event.
+type Candidate struct {
 	// The type of event related to the source system and subject. E.g. com.library.book.borrowed:v1
 	Type string `json:"type"`
 	// The source of the event. Must be a valid URI-Reference. E.g. https://library.example.com
@@ -39,7 +39,7 @@ type EventCandidate struct {
 
 // New creates a new Event with the given parameters and automatically sets the ID and Time fields.
 // It returns an error if any of the required fields are invalid.
-func New(candidate EventCandidate) (*Event, error) {
+func New(candidate Candidate) (*Event, error) {
 	event := Event{
 		ID:      uuid.New(),
 		Type:    candidate.Type,
@@ -56,6 +56,7 @@ func New(candidate EventCandidate) (*Event, error) {
 	return &event, nil
 }
 
+// FromJSON parses a JSON string into an Event and validates it.
 func FromJSON(s string) (*Event, error) {
 	var event Event
 

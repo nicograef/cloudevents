@@ -16,7 +16,7 @@ A lightweight Go library providing CloudEvents-compatible event types and valida
 - 📋 Minimal dependencies (only UUID generation)
 
 ```go
-event, err := event.New(event.EventCandidate{
+event, err := event.New(event.Candidate{
     Type:    "com.example.user.created:v1",
     Source:  "https://api.example.com",
     Subject: "/users/123",
@@ -178,7 +178,7 @@ import (
 
 func main() {
     // Create event
-    candidate := event.EventCandidate{
+    candidate := event.Candidate{
         Type:    "com.example.user.signup:v1",
         Source:  "https://myapp.com",
         Subject: "/users/123",

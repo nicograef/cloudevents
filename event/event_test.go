@@ -8,7 +8,7 @@ import (
 )
 
 func TestNew_Success(t *testing.T) {
-	candidate := EventCandidate{
+	candidate := Candidate{
 		Type:    "com.example.event:v1",
 		Source:  "https://example.com",
 		Subject: "/users/123",

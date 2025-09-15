@@ -26,7 +26,7 @@ type AddEventResponseError struct {
 // NewAddEventHandler creates an HTTP handler for adding events to the database.
 func NewAddEventHandler(db database.Database) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		candidate := event.Candidate{}
+		candidate := event.EventCandidate{}
 		if !readJSONRequest(w, r, &candidate) {
 			return
 		}
