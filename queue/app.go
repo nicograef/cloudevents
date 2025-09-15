@@ -17,34 +17,34 @@ type App struct {
 	Queue  queue.Queue
 	Server *http.Server
 	Config config.Config
+	router *http.ServeMux
 	wg     sync.WaitGroup
 }
 
 // NewApp creates a new application instance
 func NewApp(cfg config.Config) (*App, error) {
-	// Create queue
 	appQueue := queue.NewQueue(cfg.Capacity)
 
-	// Create HTTP server
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
 
+	router := http.NewServeMux()
+
 	return &App{
 		Queue:  appQueue,
 		Server: server,
 		Config: cfg,
+		router: router,
 	}, nil
 }
 
 // SetupRoutes configures HTTP routes
 func (app *App) SetupRoutes() {
-	http.HandleFunc("/", api.NewEnqueueHandler(app.Queue))
-
-	// Add health check endpoint
-	http.HandleFunc("/health", api.NewHealthHandler())
+	app.router.HandleFunc("POST /enqueue", api.NewEnqueueHandler(app.Queue))
+	app.router.HandleFunc("GET /health", api.NewHealthHandler())
 }
 
 // Run starts the application with graceful shutdown

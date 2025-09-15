@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -150,5 +151,39 @@ func TestShutdown(t *testing.T) {
 		}
 	default:
 		// Channel is closed and drained
+	}
+}
+
+func TestRun_ContextCancellation(t *testing.T) {
+	cfg := config.Config{
+		Port:        8080,
+		Capacity:    10,
+		ConsumerURL: "http://localhost:3000/webhook",
+	}
+
+	app, err := NewApp(cfg)
+	if err != nil {
+		t.Fatalf("NewApp() failed: %v", err)
+	}
+
+	// Create a cancellable context
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Run the app in a separate goroutine
+	errChan := make(chan error, 1)
+	go func() {
+		errChan <- app.Run(ctx)
+	}()
+
+	// Give the server a moment to start
+	time.Sleep(100 * time.Millisecond)
+
+	// Cancel the context to trigger shutdown
+	cancel()
+
+	// Wait for Run to return
+	err = <-errChan
+	if err != nil {
+		t.Errorf("Run() returned error: %v", err)
 	}
 }

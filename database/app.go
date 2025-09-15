@@ -15,11 +15,11 @@ type App struct {
 	Database *database.Database
 	Server   *http.Server
 	Config   config.Config
+	router   *http.ServeMux
 }
 
 // NewApp creates a new application instance
 func NewApp(cfg config.Config) (*App, error) {
-	// Load or create database
 	appDatabase, err := database.LoadFromJSONFile(cfg.DataDir)
 	if err != nil {
 		fmt.Println("No existing database found, creating a new one.")
@@ -28,26 +28,26 @@ func NewApp(cfg config.Config) (*App, error) {
 		fmt.Println("Loaded existing database from file.")
 	}
 
-	// Create HTTP server
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
 
+	router := http.NewServeMux()
+
 	return &App{
 		Database: appDatabase,
 		Server:   server,
 		Config:   cfg,
+		router:   router,
 	}, nil
 }
 
 // SetupRoutes configures HTTP routes
 func (app *App) SetupRoutes() {
-	http.HandleFunc("/add", api.NewAddEventHandler(*app.Database))
-
-	// Add health check endpoint for better testing
-	http.HandleFunc("/health", api.NewHealthHandler())
+	app.router.HandleFunc("POST /add", api.NewAddEventHandler(*app.Database))
+	app.router.HandleFunc("GET /health", api.NewHealthHandler())
 }
 
 // Run starts the application with graceful shutdown

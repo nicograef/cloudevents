@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/nicograef/cloudevents/database/config"
 )
@@ -101,5 +103,45 @@ func TestShutdown(t *testing.T) {
 	dbFile := filepath.Join(tempDir, "database.json")
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
 		t.Error("Database file was not created during shutdown")
+	}
+}
+
+func TestRun_ContextCancellation(t *testing.T) {
+	tempDir := t.TempDir()
+	cfg := config.Config{
+		Port:    9091, // Use different port to avoid conflicts with other tests
+		DataDir: tempDir,
+	}
+
+	app, err := NewApp(cfg)
+	if err != nil {
+		t.Fatalf("NewApp() failed: %v", err)
+	}
+
+	// Create a cancellable context
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Run the app in a separate goroutine
+	errChan := make(chan error, 1)
+	go func() {
+		errChan <- app.Run(ctx)
+	}()
+
+	// Give the server a moment to start
+	time.Sleep(100 * time.Millisecond)
+
+	// Cancel the context to trigger shutdown
+	cancel()
+
+	// Wait for Run to return
+	err = <-errChan
+	if err != nil {
+		t.Errorf("Run() returned error: %v", err)
+	}
+
+	// Verify database file was persisted during shutdown
+	dbFile := filepath.Join(tempDir, "database.json")
+	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
+		t.Error("Database file was not created during graceful shutdown")
 	}
 }
