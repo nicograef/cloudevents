@@ -61,3 +61,37 @@ func TestNewEnqueueHandler_MethodNotAllowed(t *testing.T) {
 		t.Errorf("expected 405, got %d", rec.Code)
 	}
 }
+
+func TestNewEnqueueHandler_InvalidJSON(t *testing.T) {
+	q := &queue.Queue{Queue: make(chan queue.QueueMessage, 1)}
+	handler := NewEnqueueHandler(*q)
+	body := bytes.NewBufferString(`{"invalid_json":}`)
+	req := httptest.NewRequest(http.MethodPost, "/", body)
+	rec := httptest.NewRecorder()
+	handler(rec, req)
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("expected 400, got %d", rec.Code)
+	}
+}
+
+func TestNewEnqueueHandler_InvalidEvent(t *testing.T) {
+	q := &queue.Queue{Queue: make(chan queue.QueueMessage, 1)}
+	handler := NewEnqueueHandler(*q)
+	body := bytes.NewBufferString(`{"type":"", "source":""}`)
+	req := httptest.NewRequest(http.MethodPost, "/", body)
+	rec := httptest.NewRecorder()
+	handler(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected 200, got %d", rec.Code)
+	}
+	var resp EnqueueResponseError
+	if err := json.NewDecoder(rec.Body).Decode(&resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if resp.Ok {
+		t.Errorf("expected error response, got %+v", resp)
+	}
+	if resp.Error == "" {
+		t.Errorf("expected error message, got empty")
+	}
+}
