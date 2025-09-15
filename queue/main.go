@@ -7,13 +7,14 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/nicograef/cloudevents/queue/app"
 	"github.com/nicograef/cloudevents/queue/config"
 )
 
 func main() {
 	cfg := config.Load()
 
-	app, err := NewApp(cfg)
+	app, err := app.NewApp(cfg)
 	if err != nil {
 		fmt.Printf("Failed to create app: %v\n", err)
 		os.Exit(1)
