@@ -24,6 +24,10 @@ type EnqueueResponseError struct {
 // It expects a POST request with a JSON body containing a 'message' field.
 func NewEnqueueHandler(appQueue queue.Queue) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if !validateMethod(w, r, http.MethodPost) {
+			return
+		}
+
 		message := event.Event{}
 		if !readJSONRequest(w, r, &message) {
 			return

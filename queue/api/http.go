@@ -28,3 +28,13 @@ func readJSONRequest[T any](w http.ResponseWriter, r *http.Request, dest *T) boo
 
 	return true
 }
+
+func validateMethod(w http.ResponseWriter, r *http.Request, expectedMethod string) bool {
+	if r.Method != expectedMethod {
+		log.Printf("WARN Invalid method %s, expected %s", r.Method, expectedMethod)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return false
+	}
+
+	return true
+}
