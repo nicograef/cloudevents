@@ -56,22 +56,3 @@ func TestReadJSONRequest_InvalidJSON(t *testing.T) {
 		t.Errorf("expected 400, got %d", rec.Code)
 	}
 }
-
-func TestValidateMethod(t *testing.T) {
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	ok := validateMethod(rec, req, http.MethodPost)
-	if ok {
-		t.Errorf("expected method not allowed")
-	}
-	if rec.Code != http.StatusMethodNotAllowed {
-		t.Errorf("expected 405, got %d", rec.Code)
-	}
-
-	rec2 := httptest.NewRecorder()
-	req2 := httptest.NewRequest(http.MethodPost, "/", nil)
-	ok2 := validateMethod(rec2, req2, http.MethodPost)
-	if !ok2 {
-		t.Errorf("expected method allowed")
-	}
-}
