@@ -29,6 +29,8 @@ jobs:
               - 'database/**'
             queue:
               - 'queue/**'
+            bus:
+              - 'bus/**'
 
   # Event module CI
   event-ci:
@@ -203,3 +205,62 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t cloudevents-queue .
+
+  # Bus module CI
+  bus-ci:
+    needs: changes
+    if: ${{ needs.changes.outputs.bus == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bus
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Lint
+        run: |
+          go install golang.org/x/lint/golint@latest
+          golint ./...
+
+      - name: Check format
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          if [ "$(goimports -l . | wc -l)" -gt 0 ]; then
+            echo "Code is not properly formatted:"
+            goimports -l .
+            exit 1
+          fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Run tests
+        run: go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Check test coverage
+        run: |
+          go tool cover -func=coverage.out
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "Total coverage: ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Coverage is below 80%"
+            exit 1
+          fi
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Build Docker image
+        run: docker build -t cloudevents-bus .
