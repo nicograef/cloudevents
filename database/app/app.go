@@ -48,6 +48,7 @@ func NewApp(cfg config.Config) (*App, error) {
 func (app *App) SetupRoutes() {
 	app.router.HandleFunc("POST /add", api.NewAddEventHandler(*app.Database))
 	app.router.HandleFunc("GET /health", api.NewHealthHandler())
+	app.Server.Handler = app.router
 }
 
 // Run starts the application with graceful shutdown
